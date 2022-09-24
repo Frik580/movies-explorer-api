@@ -8,22 +8,18 @@ const { getJwtToken } = require('../utils/jwt');
 
 const createUser = (req, res, next) => {
   const {
-    name, about, avatar, email, password,
+    name, email, password,
   } = req.body;
   return bcrypt
     .hash(password, 10)
     .then((hash) => User.create({
       name,
-      about,
-      avatar,
       email,
       password: hash,
     }))
     .then((user) => {
       const newUser = {
         name: user.name,
-        about: user.about,
-        avatar: user.avatar,
         email: user.email,
         _id: user._id,
       };
@@ -52,7 +48,6 @@ const login = (req, res, next) => {
           throw new Unauthorized('Неправильные почта или пароль');
         }
         const token = getJwtToken(user.id);
-        // console.log(token);
         res.status(200).send({ token });
       }))
     .catch(next);
@@ -73,32 +68,11 @@ const getCurrentUser = (req, res, next) => {
     });
 };
 
-const getUser = (req, res, next) => {
-  User.findById(req.params.userId)
-    .orFail(() => {
-      throw new NotFound('Пользователь с указанным id не найден');
-    })
-    .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new BadRequest('Передан некорректный id'));
-      } else {
-        next(err);
-      }
-    });
-};
-
-const getAllUsers = (req, res, next) => {
-  User.find({})
-    .then((users) => res.status(200).send(users))
-    .catch(next);
-};
-
 const updateUser = (req, res, next) => {
-  const { name, about } = req.body;
+  const { name, email } = req.body;
   User.findByIdAndUpdate(
     req.user._id,
-    { name, about },
+    { name, email },
     {
       new: true,
       runValidators: true,
@@ -118,36 +92,9 @@ const updateUser = (req, res, next) => {
     });
 };
 
-const updateAvatar = (req, res, next) => {
-  const { avatar } = req.body;
-  User.findByIdAndUpdate(
-    req.user._id,
-    { avatar },
-    {
-      new: true,
-      runValidators: true,
-      upsert: false,
-    },
-  )
-    .orFail(() => {
-      throw new NotFound('Пользователь с указанным id не найден');
-    })
-    .then((user) => res.status(200).send(user))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new BadRequest('Переданы некорректные данные при обновлении аватара'));
-      } else {
-        next(err);
-      }
-    });
-};
-
 module.exports = {
   createUser,
-  getUser,
-  getAllUsers,
   updateUser,
-  updateAvatar,
   login,
   getCurrentUser,
 };

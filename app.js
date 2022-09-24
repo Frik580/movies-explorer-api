@@ -5,7 +5,7 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 const { errors, celebrate, Joi } = require('celebrate');
 const usersRouter = require('./routes/users');
-const cardsRouter = require('./routes/cards');
+const cardsRouter = require('./routes/movie');
 const { createUser, login } = require('./contollers/users');
 const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -18,17 +18,11 @@ app.use(cors());
 
 const { PORT = 3001 } = process.env;
 
-mongoose.connect('mongodb://localhost:27017/mestodb');
+mongoose.connect('mongodb://localhost:27017/bitfilmsdb');
 
 app.use(express.json());
 
 app.use(requestLogger);
-
-app.get('/crash-test', () => {
-  setTimeout(() => {
-    throw new Error('Сервер сейчас упадёт');
-  }, 0);
-});
 
 app.post(
   '/api/signup',
