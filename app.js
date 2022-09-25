@@ -10,27 +10,24 @@ const { createUser, login } = require('./contollers/users');
 const auth = require('./middlewares/auth');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { NotFound } = require('./errors/notfound');
-const { urlPattern } = require('./utils/constants');
 
 const app = express();
 
 app.use(cors());
 
-const { PORT = 3001 } = process.env;
+const { PORT = 3000 } = process.env;
 
-mongoose.connect('mongodb://localhost:27017/bitfilmsdb');
+mongoose.connect('mongodb://localhost:27017/moviesdb');
 
 app.use(express.json());
 
 app.use(requestLogger);
 
 app.post(
-  '/api/signup',
+  '/signup',
   celebrate({
     body: Joi.object().keys({
       name: Joi.string().min(2).max(30),
-      about: Joi.string().min(2).max(30),
-      avatar: Joi.string().pattern(urlPattern),
       email: Joi.string().required().email(),
       password: Joi.string().required(),
     }),
@@ -38,7 +35,7 @@ app.post(
   createUser,
 );
 app.post(
-  '/api/signin',
+  '/signin',
   celebrate({
     body: Joi.object().keys({
       email: Joi.string().required().email(),
@@ -50,8 +47,8 @@ app.post(
 
 app.use(auth);
 
-app.use('/api/', usersRouter);
-app.use('/api/', cardsRouter);
+app.use('/', usersRouter);
+app.use('/', cardsRouter);
 app.use('*', () => {
   throw new NotFound('Страница не найдена');
 });
