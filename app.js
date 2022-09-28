@@ -14,6 +14,8 @@ const { NODE_ENV, DB_ROUTE } = process.env;
 
 const app = express();
 
+app.use(requestLogger);
+
 app.use(cors());
 
 app.use(helmet());
@@ -27,8 +29,6 @@ mongoose.connect(
 );
 
 app.use(express.json());
-
-app.use(requestLogger);
 
 app.use('/', router);
 

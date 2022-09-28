@@ -48,7 +48,7 @@ const movieSchema = new mongoose.Schema({
       validator(v) {
         return urlPattern.test(v);
       },
-      message: 'Передана некорректная ссылка на постер к фильму',
+      message: 'Передана некорректная ссылка на изображение к фильму',
     },
     required: true,
   },

@@ -1,5 +1,5 @@
 const { celebrate, Joi } = require('celebrate');
-const { urlPattern } = require('../utils/constants');
+const validator = require('validator');
 
 const validateCreateUser = celebrate({
   body: Joi.object().keys({
@@ -36,9 +36,36 @@ const validateCreateMovie = celebrate({
     duration: Joi.number().required(),
     year: Joi.string().required(),
     description: Joi.string().required(),
-    image: Joi.string().required().pattern(urlPattern),
-    trailerLink: Joi.string().required().pattern(urlPattern),
-    thumbnail: Joi.string().required().pattern(urlPattern),
+    image: Joi.string()
+      .required()
+      .custom((value, helpers) => {
+        if (validator.isURL(value)) {
+          return value;
+        }
+        return helpers.message(
+          'Передана некорректная ссылка на постер к фильму',
+        );
+      }),
+    trailerLink: Joi.string()
+      .required()
+      .custom((value, helpers) => {
+        if (validator.isURL(value)) {
+          return value;
+        }
+        return helpers.message(
+          'Передана некорректная ссылка на трейлер фильма',
+        );
+      }),
+    thumbnail: Joi.string()
+      .required()
+      .custom((value, helpers) => {
+        if (validator.isURL(value)) {
+          return value;
+        }
+        return helpers.message(
+          'Передана некорректная ссылка на изображение к фильму',
+        );
+      }),
     movieId: Joi.required(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
